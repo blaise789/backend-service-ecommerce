@@ -2,6 +2,7 @@ import express, { query } from "express"
 import { PORT } from "./secret"
 import authRoutes from "./routes/auth.routes"
 import { PrismaClient } from "@prisma/client"
+import { handleError } from "./middlewares/error-handler.middleware"
 const app=express()
 app.use(express.json())
 app.get("/",(req,res)=>{
@@ -14,6 +15,7 @@ export const prismaClient=new PrismaClient({
 )
 app.use("/api/v1/auth",authRoutes)
 // app.use("/api/v1/")
+app.use(handleError)
 app.listen(PORT || 4000,()=>{
 console.log(`the server is running on port ${PORT}`)    
 })
