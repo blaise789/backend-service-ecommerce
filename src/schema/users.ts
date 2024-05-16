@@ -1,5 +1,5 @@
  import {z} from "zod"
- const signupSchema=z.object({
+ export  const SignUpSchema=z.object({
     name:z.string(),
     email:z.string().email(),
     password:z.string().min(6)

@@ -5,15 +5,24 @@ import * as jwt from "jsonwebtoken"
 import { JWT_SECRET } from "../secret";
 import { BadRequestsException } from "../exceptions/bad-request";
 import { ErrorCode } from "../exceptions/root";
-import { User } from "@prisma/client";
-export  const signup=async (req:Request,res:Response,next:NextFunction)=>{
+import { SignUpSchema } from "../schema/users";
+import { UnprocessableEntity } from "../exceptions/validation";
+
+
+export  const signup=async (req:Request,res:Response)=>{
+    const schema= SignUpSchema.safeParse(req.body)
+    if(!schema.success){
+  throw new UnprocessableEntity(schema.error.issues,"unable to validate your data",ErrorCode.UNPROCESSABLE_ENTITY)
+    }
+
+    
     // try{
     const {name,email,password}=req.body;
 
     let user=await prismaClient.user.findFirst({where:{email}})
     if(user){
-       next(new BadRequestsException("user already exists",ErrorCode.USER_ALREADY_EXISTS))  
-       return
+      throw new BadRequestsException("user already exists",ErrorCode.USER_ALREADY_EXISTS)
+       
     }
     user=await prismaClient.user.create({
         data:{
@@ -25,23 +34,23 @@ export  const signup=async (req:Request,res:Response,next:NextFunction)=>{
 
     })
     
-    res.status(201).json({message:"successfull created your account",user}) 
-// }
-// catch(err:any){
-//     res.status(400).json({message:err.message})
-// }   
+    return res.status(201).json({message:"successfull created your account",user}) 
 }
+// catch(err:any){
+    // next(new UnprocessableEntity(err?.cause?.issues,"invalid data",ErrorCode.UNPROCESSABLE_ENTITY))
+// }   
+// }
 export const login=async (req:Request,res:Response,next:NextFunction)=>{
     // try{
     const {email,password}=req.body
     let  user =await prismaClient.user.findFirst({where:{email}})
     if(!user){
- next(new BadRequestsException("user is not authenticated",ErrorCode.USER_NOT_FOUND))
- return
+  throw new BadRequestsException("user does not exist",ErrorCode.USER_NOT_FOUND)
+ 
     }
     const isMatch= compareSync(password,user.password)
     if(!isMatch){
-        next(new BadRequestsException("incorrect password",ErrorCode.INCORRECT_PASSWORD))
+    throw new BadRequestsException("incorrect password",ErrorCode.INCORRECT_PASSWORD)
     }
     const token=jwt.sign({
         userId:user.id
