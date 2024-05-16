@@ -4,6 +4,7 @@ import authRoutes from "./routes/auth.routes"
 import { PrismaClient } from "@prisma/client"
 import { SignUpSchema } from "./schema/users"
 import { errorMiddleware } from "./middlewares/error.middleware"
+import { authMiddleware } from "./middlewares/auth.middleware"
 const app=express()
 app.use(express.json())
 app.get("/",(req,res)=>{
@@ -24,7 +25,11 @@ export const prismaClient=new PrismaClient({
 //         }
 //     }
 // })
+
 app.use("/api/v1/auth",authRoutes)
+app.use("/api/v1/me",authMiddleware,(req,res)=>{
+    res.send("hello world")
+})
 // app.use("/api/v1/")
 app.use(errorMiddleware)
 app.listen(PORT || 4000,()=>{
