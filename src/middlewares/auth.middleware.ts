@@ -26,7 +26,7 @@ export  const authMiddleware=async (req:RequestWithUser,res:Response,next:NextFu
    const user= await prismaClient.user.findFirst({where:{id:payload.userId}})
    
    if(!user){
-    throw new NotFoundException("user does not exists",ErrorCode.USER_NOT_FOUND)
+    throw new NotFoundException("user does not exists",ErrorCode.NOT_FOUND)
    }
    req.user=user
    next()

@@ -33,8 +33,6 @@ export  const signup=async (req:Request,res:Response)=>{
           email,
           password:hashSync(password,10),
           role:Role.USER,
-          profile:"avatar.png"
-          
       
            
         }
@@ -54,7 +52,7 @@ export const login=async (req:Request,res:Response,next:NextFunction)=>{
     const {email,password}=req.body
     let  user =await prismaClient.user.findFirst({where:{email}})
     if(!user){
-  throw new BadRequestsException("user does not exist",ErrorCode.USER_NOT_FOUND)
+  throw new BadRequestsException("user does not exist",ErrorCode.NOT_FOUND)
  
     }
     const isMatch= compareSync(password,user.password)

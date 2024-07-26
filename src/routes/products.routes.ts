@@ -2,13 +2,14 @@ import { Router } from "express";
 import { authMiddleware } from "../middlewares/auth.middleware";
 import adminMiddleware from "../middlewares/admin";
 import { errorHandler } from "../errorhandler/error-handler";
-import { createProduct, deleteProduct, updateProduct } from "../controllers/product.controller";
+import { createProduct, deleteProduct, findProduct, listProducts, updateProduct } from "../controllers/product.controller";
 
-const router:Router=Router()
+const productRoutes:Router=Router()
 
-router.post("/",[authMiddleware,adminMiddleware],errorHandler(createProduct))
-router.put("/:id",[authMiddleware,adminMiddleware],errorHandler(updateProduct))
-router.delete("/:id",[authMiddleware,adminMiddleware],errorHandler(deleteProduct))
-
-export default router
+productRoutes.post("/",[authMiddleware,adminMiddleware],errorHandler(createProduct))
+productRoutes.put("/:id",[authMiddleware,adminMiddleware],errorHandler(updateProduct))
+productRoutes.delete("/:id",[authMiddleware,adminMiddleware],errorHandler(deleteProduct))
+productRoutes.get("/:id",[authMiddleware,adminMiddleware],errorHandler(findProduct))
+productRoutes.get("/",errorHandler(listProducts))
+export default productRoutes
 
