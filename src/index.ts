@@ -5,6 +5,7 @@ import { PrismaClient } from "@prisma/client"
 import { SignUpSchema } from "./schema/users"
 import { errorMiddleware } from "./middlewares/error.middleware"
 import { authMiddleware } from "./middlewares/auth.middleware"
+import productRoutes from "./routes/auth.routes"
 const app=express()
 app.use(express.json())
 app.get("/",(req,res)=>{
@@ -27,6 +28,7 @@ export const prismaClient=new PrismaClient({
 // })
 
 app.use("/api/v1/auth",authRoutes)
+app.use("/api/v1/products",productRoutes)
 app.use("/api/v1/me",authMiddleware,(req,res)=>{
     res.send("hello world")
 })

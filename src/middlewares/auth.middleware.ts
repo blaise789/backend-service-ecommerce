@@ -1,29 +1,36 @@
-import { NextFunction, Request, Response } from "express";
+import e, { NextFunction, Request, Response } from "express";
 import { UnAuthorizedException } from "../exceptions/unauthorized.exception";
 import { ErrorCode } from "../exceptions/root";
 import { JWT_SECRET } from "../secret";
 import * as jwt from "jsonwebtoken"
 import { prismaClient } from "..";
-import { any } from "zod";
 import { NotFoundException } from "../exceptions/not-found.exception";
+import { RequestWithUser } from "../types/reqWithUser";
 
-export const authMiddleware=async (req:Request,res:Response,next:NextFunction)=>{
+
+export  const authMiddleware=async (req:RequestWithUser,res:Response,next:NextFunction)=>{
     
  
     try{
-        const token=req.headers.authorization
-        if(!token){
+        const bearer=req.headers.authorization
+
+        
+        if(!bearer){
             throw new UnAuthorizedException("Unauthorized end point",ErrorCode.UNAUTHORIZED_EXCEPTION)
             
-            
         }
-   const payload:{userId:number}= jwt.verify(token,JWT_SECRET)  as any
-   const user=prismaClient.user.findFirst({where:{id:payload.userId}})
-//    req.user=user
+        const token=bearer.split(" ")[1]
+
+   const payload= jwt.verify(token,JWT_SECRET)  as jwt.JwtPayload
+   console.log(payload)
+   const user= await prismaClient.user.findFirst({where:{id:payload.userId}})
+   
    if(!user){
     throw new NotFoundException("user does not exists",ErrorCode.USER_NOT_FOUND)
    }
- 
+   req.user=user
+   next()
+   
    
     }
     catch(err:any){

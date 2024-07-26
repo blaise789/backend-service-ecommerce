@@ -4,7 +4,7 @@ import { login, signup } from "../controllers/auth.controller";
 import { errorHandler } from "../errorhandler/error-handler";
 
 
-const router:Router=express.Router()
-router.post("/signup",errorHandler(signup))
-router.post("/login",errorHandler(login))
-export default router
+const productRouter:Router=express.Router()
+productRouter.post("/signup",errorHandler(signup))
+productRouter.post("/login",errorHandler(login))
+export default productRouter

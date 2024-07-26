@@ -7,9 +7,12 @@ import { BadRequestsException } from "../exceptions/bad-request";
 import { ErrorCode } from "../exceptions/root";
 import { SignUpSchema } from "../schema/users";
 import { UnprocessableEntity } from "../exceptions/validation";
+import { Role } from "@prisma/client";
 
 
 export  const signup=async (req:Request,res:Response)=>{
+    
+
     const schema= SignUpSchema.safeParse(req.body)
     if(!schema.success){
   throw new UnprocessableEntity(schema.error.issues,"unable to validate your data",ErrorCode.UNPROCESSABLE_ENTITY)
@@ -17,31 +20,37 @@ export  const signup=async (req:Request,res:Response)=>{
 
     
     // try{
-    const {name,email,password}=req.body;
+    const {name,email,password,profile}=req.body;
 
-    let user=await prismaClient.user.findFirst({where:{email}})
+    const user=await prismaClient.user.findFirst({where:{email}})
     if(user){
       throw new BadRequestsException("user already exists",ErrorCode.USER_ALREADY_EXISTS)
        
     }
-    user=await prismaClient.user.create({
+    const newUser=await prismaClient.user.create({
         data:{
-            name,
-            email,
-            password:hashSync(password,10)
+          name,
+          email,
+          password:hashSync(password,10),
+          role:Role.USER,
+          profile:"avatar.png"
+          
+      
+           
         }
         
 
     })
     
-    return res.status(201).json({message:"successfull created your account",user}) 
+    return res.status(201).json({message:"successfull created your account",newUser}) 
 }
-// catch(err:any){
-    // next(new UnprocessableEntity(err?.cause?.issues,"invalid data",ErrorCode.UNPROCESSABLE_ENTITY))
-// }   
-// }
+
+
+
+
+
 export const login=async (req:Request,res:Response,next:NextFunction)=>{
-    // try{
+
     const {email,password}=req.body
     let  user =await prismaClient.user.findFirst({where:{email}})
     if(!user){
@@ -58,10 +67,6 @@ export const login=async (req:Request,res:Response,next:NextFunction)=>{
     },
 JWT_SECRET
     )
-    res.status(200).json({message:"user logged in successfully",user,token})
+    res.status(200).json({message:"user logged in successfully",token})
 }
-// catch(err:any){
-//     res.status(400).json({message:err.message})
 
-    
-// }
