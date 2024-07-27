@@ -73,7 +73,19 @@ export const deleteItemFromCart = async (req: RequestWithUser, res: Response) =>
     res.json({ success: "true" })
 
 }
-export const changeQuantity = async (req: Request, res: Response) => {
+export const changeQuantity = async (req: RequestWithUser, res: Response) => {
+    const ItemExists = await prismaClient.cartItem.findFirst({
+        where: {
+            id: +req.params.id
+        }
+    })
+    if (!ItemExists) {
+        throw new NotFoundException("cart Item does not exist", ErrorCode.NOT_FOUND)
+
+    }
+    else if (ItemExists.userId != req.user.id) {
+        throw new UnAuthorizedException("the cart Item does not belong to you", ErrorCode.NOT_FOUND)
+    }
     const validatedData = ChangeQuantitySchema.parse(req.body)
     const updatedCart = await prismaClient.cartItem.update({
         where: {

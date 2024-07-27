@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express"
-import { AddressSchema, UpdateUserSchema } from "../schema/users"
+import { AddressSchema, UpdateRoleSchema, UpdateUserSchema } from "../schema/users"
 import { NotFoundException } from "../exceptions/not-found.exception"
 import { ErrorCode } from "../exceptions/root"
 import { RequestWithUser } from "../types/reqWithUser"
@@ -98,11 +98,48 @@ return res.send(updatedUser)
 }
 
 export const changeUserRole = async (req: Request, res: Response, next: NextFunction) => {
+  UpdateRoleSchema.parse(req.body)
    
-  
+  const user=await prismaClient.user.findFirst({
+    where:{
+      id:+req.params.id
+    },
+    include:{
+      addresses:true
+    }
+  })
+  if(!user){
+    throw new NotFoundException("user doesn't exist",ErrorCode.NOT_FOUND)
+  }
+  const updatedUser=await prismaClient.user.update({
+    where:{
+      id:+req.params.id
+    },
+    data:{
+      role:req.body.role
+    }
+  })
+  res.json(updatedUser)
 }
 export const getUserById=async(req:Request,res:Response,next:NextFunction)=>{
+  const user=await prismaClient.user.findFirst({
+    where:{
+      id:+req.params.id
+    },
+    include:{
+      addresses:true
+    }
+  })
+  if(!user){
+    throw new NotFoundException("user doesn't exist",ErrorCode.NOT_FOUND)
+  }
+  res.json(user)
   
 }
 export const listUsers=async(req:Request,res:Response,next:NextFunction)=>{
+  const users= await prismaClient.user.findMany({
+    skip:+req.query.skip || 0,
+    take:5
+  })
+  res.json(users)
   }
