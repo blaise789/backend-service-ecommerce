@@ -12,7 +12,7 @@ import {z} from "zod"
    city:z.string(),
  })
  export const UpdateUserSchema=z.object({
-  name:z.string(),
+  name:z.string().nullable().optional(),
   defaultShippingAddress:z.number().nullable().optional(),
   defaultBillingAddress:z.number().nullable().optional()
 })

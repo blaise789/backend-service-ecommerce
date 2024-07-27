@@ -98,12 +98,16 @@ return res.send(updatedUser)
 }
 
 export const changeUserRole = async (req: Request, res: Response, next: NextFunction) => {
-  UpdateRoleSchema.parse(req.body)
-   
+  const valid=UpdateRoleSchema.safeParse(req.body)
+ 
+   if(valid.error){
+    throw new BadRequestsException(valid.error.message,ErrorCode.UNPROCESSABLE_ENTITY)
+   }
   const user=await prismaClient.user.findFirst({
     where:{
       id:+req.params.id
     },
+
     include:{
       addresses:true
     }

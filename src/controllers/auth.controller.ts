@@ -68,3 +68,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
   res.status(200).json({ message: "user logged in successfully", token })
 }
 
+
+export  const logout=async (req:Request,res:Response)=>{
+  
+}

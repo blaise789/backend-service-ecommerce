@@ -51,47 +51,67 @@ export const updateProduct = async (req: Request, res: Response, next: NextFunct
 
 }
 export const deleteProduct = async (req: Request, res: Response, next: NextFunction) => {
-    try { 
+    try {
         const productId = req.params.id
         const product = await prismaClient.product.delete({
             where: {
                 id: parseInt(productId)
             }
         })
-    
-        res.json({"message":"product deleted successfully"})
-    
-    }
-    catch (err:any) {
-        next(new NotFoundException("product not found",ErrorCode.NOT_FOUND))
+
+        res.json({ "message": "product deleted successfully" })
 
     }
-    
+    catch (err: any) {
+        next(new NotFoundException("product not found", ErrorCode.NOT_FOUND))
+
+    }
+
 }
-export const findProduct=async(req:Request,res:Response,next:NextFunction)=>{
-    try{
-        const productId=req.params.id
-        const product=await prismaClient.product.findFirstOrThrow({
-            where:{
-                id:+productId
+export const findProduct = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const productId = req.params.id
+        const product = await prismaClient.product.findFirstOrThrow({
+            where: {
+                id: +productId
             }
         })
         return res.json(product)
 
 
     }
-    catch(err:any){
-        next(new NotFoundException("product not found",ErrorCode.NOT_FOUND))
+    catch (err: any) {
+        next(new NotFoundException("product not found", ErrorCode.NOT_FOUND))
     }
 
 }
-export const listProducts=async(req:Request,res:Response,next:NextFunction)=>{
-    const count=await prismaClient.product.count()
-    const skip=req.query.skip as string
+export const listProducts = async (req: Request, res: Response, next: NextFunction) => {
+    const count = await prismaClient.product.count()
+    const skip = req.query.skip as string
 
-    const products=await prismaClient.product.findMany({
-        skip:+skip|| 0 ,
-        take:5
+    const products = await prismaClient.product.findMany({
+        skip: +skip || 0,
+        take: 5
     })
-    res.json({count,products})
+    res.json({ count, products })
+}
+export const searchProducts = async (req: Request, res: Response) => {
+    const products = await prismaClient.product.findMany({
+        where: {
+            name: {
+                search: req.query.q.toString()
+            },
+            description:{
+                search:req.query.q.toString()
+            },
+            tags:{
+                search:req.query.q.toString()
+            }
+
+
+
+        }
+    })
+    res.json(products)
+
 }

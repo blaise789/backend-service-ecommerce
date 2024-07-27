@@ -64,16 +64,7 @@ res.json({order,orderEvent})
 
 })
 }
-export const listOrders=async(req:RequestWithUser,res:Response)=>{
-    const orders=await prismaClient.order.findMany({
-        where:{
-            userId:req.user.id
-        }
-    })
-   return res.json(orders)
 
-
-}
 export const cancelOrder=async(req:RequestWithUser,res:Response)=>{
     const order =await prismaClient.order.findFirst({
         where:{
@@ -126,4 +117,23 @@ export const getOrderById=async(req:RequestWithUser,res:Response)=>{
         return res.status(403)
     }
  return res.json(order)
+}
+
+export const listAllOrders=async(req:RequestWithUser,res:Response)=>{
+let whereClause={}
+const status=req.query.status
+if(status){
+    whereClause={
+        status
+    }
+}
+const orders=await prismaClient.order.findMany({
+    where:whereClause,
+    skip:+req.query.skip || 0,
+    take:5
+})
+return res.json(orders)
+}
+export const updateOrderStatus=()=>{
+
 }
