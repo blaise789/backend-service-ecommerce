@@ -17,7 +17,13 @@ enum Role {
   ADMIN
   USER
 }
-
+enum OrderEventStatus{
+  PENDING
+  ACCEPTED
+  OUT_FOR_DELIVERY
+  DELIVERED
+  CANCELED
+}
 model User {
   id                     Int        @id @default(autoincrement())
   name                   String     @db.VarChar(191)
@@ -28,9 +34,10 @@ model User {
   defaultShippingAddress Int?
   defaultBillingAddress  Int?
   createdAt              DateTime   @default(now())
-  updatedAt              DateTime   @default(now())
+  updatedAt              DateTime   @updatedAt
   addresses              Address[]
   cartItems              CartItem[]
+  orders                 Order[]
 
   @@map("users")
 }
@@ -51,12 +58,15 @@ model Address {
 }
 
 model CartItem {
-  id       Int  @id @default(autoincrement())
-  userId   Int
-  quantity Int
-  user     User @relation(fields: [userId], references: [id])
+  id        Int     @id @default(autoincrement())
+  userId    Int
+  quantity  Int
+  user      User    @relation(fields: [userId], references: [id])
   productId Int
   product   Product @relation(fields: [productId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@map("cart_items")
 }
 
 model Product {
@@ -66,7 +76,42 @@ model Product {
   price       Decimal
   tags        String
   createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
   cartItems   CartItem[]
-
+  orderProducts OrderProduct[]
   @@map("products")
+}
+
+model Order {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  products OrderProduct[]
+  orderEvents OrderEvent[]
+  address String
+  netAmount Decimal
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@map("orders")
+}
+model OrderProduct{
+    id        Int      @id @default(autoincrement())
+  orderId    Int
+  productId Int
+  product Product @relation(fields: [productId],references: [id])
+  order      Order   @relation(fields: [orderId], references: [id])
+  quantity Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("order_products")
+}
+model OrderEvent{
+   id        Int      @id @default(autoincrement())
+  orderId    Int
+  order      Order   @relation(fields: [orderId], references: [id])
+  status OrderEventStatus @default(PENDING)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+ @@map("order_events")
 }

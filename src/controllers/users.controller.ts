@@ -96,3 +96,13 @@ const updatedUser=await prismaClient.user.update({
 })
 return res.send(updatedUser)
 }
+
+export const changeUserRole = async (req: Request, res: Response, next: NextFunction) => {
+   
+  
+}
+export const getUserById=async(req:Request,res:Response,next:NextFunction)=>{
+  
+}
+export const listUsers=async(req:Request,res:Response,next:NextFunction)=>{
+  }
