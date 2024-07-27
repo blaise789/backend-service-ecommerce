@@ -5,6 +5,7 @@ import { PrismaClient } from "@prisma/client"
 import { errorMiddleware } from "./middlewares/error.middleware"
 import productRoutes from "./routes/products.routes"
 import userRoutes from "./routes/users.routes"
+import cartRoutes from "./routes/cart.routes"
 const app=express()
 app.use(express.json())
 app.get("/",(req,res)=>{
@@ -29,7 +30,7 @@ export const prismaClient=new PrismaClient({
 app.use("/api/v1/auth",authRoutes)
 app.use("/api/v1/products",productRoutes)
 app.use("/api/v1/users/",userRoutes)
-
+app.use("/api/v1/cart",cartRoutes)
 // app.use("/api/v1/")
 app.use(errorMiddleware)
 app.listen(PORT || 4000,()=>{
